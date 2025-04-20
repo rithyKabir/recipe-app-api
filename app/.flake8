@@ -6,4 +6,5 @@ exclude =
     .env,
     .vscode,
     migrations,
+    app/app/settings.py,
     
