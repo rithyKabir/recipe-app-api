@@ -9,11 +9,12 @@ from django.urls import (
 
 from rest_framework.routers import DefaultRouter
 
-from recipe.views import RecipeViewSet
+from recipe.views import RecipeViewSet, TagViewSet
 
 # Create a router and register our viewset with it.
 router = DefaultRouter()
 router.register('recipes', RecipeViewSet)
+router.register('tags', TagViewSet)
 
 app_name = 'recipe'
 
