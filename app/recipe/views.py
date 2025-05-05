@@ -31,10 +31,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Create a new recipe."""
         serializer.save(user=self.request.user)
 
-class TagViewSet(mixins.ListModelMixin,
-                     mixins.CreateModelMixin,
-                     mixins.DestroyModelMixin,
-                     viewsets.GenericViewSet):
+#Mixins should be passed before GenericViewSet so that the viewset can be overriden.
+# Mixins are designed to work with GenericViewSet or GenericAPIView, but they require the base class to provide the necessary functionality.
+class TagViewSet(mixins.UpdateModelMixin,
+                 mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 mixins.DestroyModelMixin,
+                 viewsets.GenericViewSet):
     """Manage tags in the database."""
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
