@@ -109,4 +109,130 @@ class PrivateRecipeApiTests(TestCase):
         in the recipe, then we are going to create the tags first and then
         make the relating between tags and recipe.
         """
-        
+        payload = {
+            'title': 'Sample Recipe',
+            'time_minutes': 30,
+            'price': Decimal('10.00'),
+            'tags': [{'name': 'Vegan'}, {'name': 'Dessert'}]
+        }
+        res = self.client.post(RECIPE_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipes = Recipe.objects.filter(user = self.user)
+        self.assertEqual(recipes.count(), 1)
+        recipe = recipes[0]
+        self.assertEqual(recipe.tags.count(), 2)
+        for tag in payload['tags']:
+            exists = recipe.tags.filter(
+                name=tag['name'],
+                user=self.user
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_create_recipe_with_existing_tags(self):
+        """Test creating a recipe with existing tags. If the tag already exists
+        in the database, we just need to relate the recipe with the tag.
+        """
+        tag_1 = Tag.objects.create(user=self.user, name='Vegan')
+        payload = {
+            'title': 'Sample Recipe',
+            'time_minutes': 30,
+            'price': Decimal('10.00'),
+            'tags': [{'name': 'Vegan'}, {'name': 'Dessert'}]
+        }
+        res = self.client.post(RECIPE_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipes = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipes.count(), 1)
+        recipe = recipes[0]
+        self.assertEqual(recipe.tags.count(), 2)
+        self.assertIn(tag_1, recipe.tags.all())
+        for tag in payload['tags']:
+            exists = recipe.tags.filter(
+                name=tag['name'],
+                user=self.user
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_create_recipe_with_invalid_tags(self):
+        """Test creating a recipe with invalid tags."""
+        payload = {
+            'title': 'Sample Recipe',
+            'time_minutes': 30,
+            'price': Decimal('10.00'),
+            'tags': [{'name': ''}]
+        }
+        res = self.client.post(RECIPE_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Recipe.objects.count(), 0)
+        self.assertEqual(Tag.objects.count(), 0)
+    
+    def test_create_recipe_without_tags(self):
+        """Test creating a recipe without tags."""
+        payload = {
+            'title': 'Sample Recipe',
+            'time_minutes': 30,
+            'price': Decimal('10.00'),
+            'tags': []
+        }
+        res = self.client.post(RECIPE_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.get(id=res.data['id'])
+        self.assertEqual(recipe.tags.count(), 0)
+
+    def test_create_tags_on_update(self):
+        """Test creating tags when updating a recipe."""
+        recipe = create_recipe(user=self.user)
+        payload = {
+            'tags': [{'name': 'Vegan'}, {'name': 'Dessert'}]
+        }
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_tags = Tag.objects.filter(user=self.user)
+        self.assertEqual(new_tags.count(), 2)
+        for tag in payload['tags']:
+            exists = new_tags.filter(
+                name=tag['name'],
+                user=self.user
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_partial_update_recipe(self):
+        """Test updating a recipe with patch."""
+        original_link = 'http://example.com/recipe.pdf'
+        recipe = create_recipe(
+            user=self.user,
+            title='Sample Recipe',
+            link=original_link
+        )
+        payload = {'title': 'New Recipe Title'}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.title, payload['title'])
+        self.assertEqual(recipe.link, original_link)
+
+    def test_full_update_recipe(self):
+        """Test updating a recipe with put."""
+        recipe = create_recipe(
+            user=self.user,
+            title='Sample Recipe',
+            link='http://example.com/recipe.pdf'
+        )
+        payload = {
+            'title': 'New Recipe Title',
+            'time_minutes': 10,
+            'price': Decimal('5.50'),
+            'description': 'New description',
+            'link': 'http://example.com/new-recipe.pdf'
+        }
+        url = detail_url(recipe.id)
+        res = self.client.put(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        recipe.refresh_from_db()
+        for k, v in payload.items():
+            self.assertEqual(getattr(recipe, k), v)
