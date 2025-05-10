@@ -7,8 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from recipe.serializers import (RecipeSerializer, 
                                 RecipeDetailSerializer, 
-                                TagSerializer)
-from core.models import (Recipe, Tag)
+                                TagSerializer,
+                                IngredientSerializer)
+from core.models import (Recipe, Tag,Ingredient)
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """View for managing recipe APIs."""
@@ -33,17 +34,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 #Mixins should be passed before GenericViewSet so that the viewset can be overriden.
 # Mixins are designed to work with GenericViewSet or GenericAPIView, but they require the base class to provide the necessary functionality.
-class TagViewSet(mixins.UpdateModelMixin,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin,
-                 mixins.DestroyModelMixin,
-                 viewsets.GenericViewSet):
-    """Manage tags in the database."""
-    serializer_class = TagSerializer
-    queryset = Tag.objects.all()
+
+class BaseRecipeAttrViewSet(mixins.UpdateModelMixin,
+                            mixins.ListModelMixin,
+                            mixins.DestroyModelMixin,
+                            viewsets.GenericViewSet):
+    """Base viewset for recipe attributes."""
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return tags for the authenticated user."""
+        """Return objects for the authenticated user."""
         return self.queryset.filter(user=self.request.user).order_by('-name')
+class TagViewSet(BaseRecipeAttrViewSet):
+    """Manage tags in the database."""
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+
+class IngredientViewSet(BaseRecipeAttrViewSet):
+    """Manage ingredients in the database."""
+    serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
+    
