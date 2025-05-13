@@ -7,8 +7,8 @@ from unittest.mock import patch
 from decimal import Decimal
 from django.test import TestCase
 """
-get_user_model is a default function that returns the User model that is 
-active in the current project. It is best practice to use this function cause 
+get_user_model is a default function that returns the User model that is
+active in the current project. It is best practice to use this function cause
 it'll be easier to handle the test case even if the user model is changed for
 some reason.
 """

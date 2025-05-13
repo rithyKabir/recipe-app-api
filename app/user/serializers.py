@@ -23,13 +23,13 @@ class UserSerializer(serializers.ModelSerializer):
         user = super().update(instance, validated_data)
 
         if password:
-            """We are setting the password in different 
+            """We are setting the password in different
             way to ensure it is hashed."""
             user.set_password(password)
             user.save()
 
         return user
-    
+
 
 class AuthTokenSerializer(serializers.Serializer):
     """Serializer for the user authentication object."""
