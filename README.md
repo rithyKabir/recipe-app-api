@@ -1,5 +1,5 @@
 # recipe-app-api
-Recipe API project using Django
+Recipe API project using Django Rest Framework
 
 To run this project locally :
 1. Pull the project.
