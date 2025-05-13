@@ -34,12 +34,12 @@ class ModelTests(TestCase):
         self.assertEqual(user.email, email)
         """
         We are using user.check_password instead of user.password == password
-        because the password will be saved as a hash in the database. this 
+        because the password will be saved as a hash in the database. this
         check_password method will hash the password and compare it to the
         given value. it is a default method of the user model.
         """
         self.assertTrue(user.check_password(password))
-    
+
     def test_new_user_email_normalized(self):
         """Test email is normalized for new users."""
         sample_emails = [
@@ -52,9 +52,9 @@ class ModelTests(TestCase):
             user = get_user_model().objects.create_user(email, 'sample123')
             self.assertEqual(user.email, expected)
 
-    def test_new_user_without_email_raises_error(self):         
-        """Test that creating a user without an email raises a ValueError."""         
-        with self.assertRaises(ValueError):             
+    def test_new_user_without_email_raises_error(self):
+        """Test that creating a user without an email raises a ValueError."""
+        with self.assertRaises(ValueError):
             get_user_model().objects.create_user('', 'test123')
 
     def test_create_superuser(self):
@@ -63,7 +63,7 @@ class ModelTests(TestCase):
              'test@example.com',
              'test123',
          )
- 
+
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
@@ -102,7 +102,7 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(ingredient), ingredient.name)
-    
+
     @patch('core.models.uuid.uuid4')
     def test_recipe_file_name_uuid(self, mock_uuid):
         """Test that image is saved in the correct location."""

@@ -59,11 +59,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         if tags_data is not None:
             instance.tags.clear()
             self._create_or_update_tags(instance, tags_data)
-        
+
         if ingredients_data is not None:
             instance.ingredients.clear()
             self._get_or_create_ingredients(instance, ingredients_data)
-            
+    
         return super().update(instance, validated_data)
 
     def _create_or_update_tags(self, recipe, tags_data):

@@ -64,7 +64,7 @@ class PrivateTagsApiTests(TestCase):
         Tag.objects.create(user=user2, name='Lunch')
         tag = Tag.objects.create(user=self.user, name='Dinner')
         res = self.client.get(TAGS_URL)
-        
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], tag.name)
@@ -83,7 +83,7 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(tag.name, payload['name'])
     """
     Testcase class runs in isolation. Hence before running each test method
-    the database is reset and other tags created in other test method doesnt 
+    the database is reset and other tags created in other test method doesnt
     exists.
     """
     def test_delete_tag(self):
@@ -95,7 +95,7 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         tags = Tag.objects.filter(user=self.user)
         self.assertFalse(tags.exists())
-    
+
     def test_filter_tags_assigned_to_recipes(self):
         """Test listing tags assigned to recipes."""
         tag1 = Tag.objects.create(user=self.user, name='Vegan')
@@ -111,7 +111,7 @@ class PrivateTagsApiTests(TestCase):
         res = self.client.get(TAGS_URL, {'assigned_only': 1})
         serializer1 = TagSerializer(tag2)
         serializer2 = TagSerializer(tag1)
-        
+
         self.assertIn(serializer1.data, res.data)
         self.assertNotIn(serializer2.data, res.data)
 

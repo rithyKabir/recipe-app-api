@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, password=None, **extra_fields):
         """Create and return a superuser with an email and password."""
         extra_fields.setdefault('is_staff', True)
@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
-    
+
 
 class Recipe(models.Model):
     """Recipe model."""
@@ -69,11 +69,11 @@ class Recipe(models.Model):
     tags = models.ManyToManyField('Tag', blank=True)
     ingredients = models.ManyToManyField('Ingredient', blank=True)
     # Not calling the function, sending the reference of the function
-    image = models.ImageField(null=True, upload_to=recipe_image_file_path) 
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path)
 
     def __str__(self):
         return self.title
-    
+
 
 class Tag(models.Model):
     """Tag for filtering recipes."""
@@ -82,11 +82,11 @@ class Tag(models.Model):
         on_delete=models.CASCADE
     )
     name = models.CharField(max_length=255)
-    
+
     def __str__(self):
         return self.name
-    
-    
+
+
 class Ingredient(models.Model):
     """Ingredient for recipes."""
     name = models.CharField(max_length=255)

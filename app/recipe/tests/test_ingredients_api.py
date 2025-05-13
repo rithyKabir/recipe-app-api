@@ -69,7 +69,7 @@ class PrivateIngredientApiTests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], ingredient.name)
         self.assertEqual(res.data[0]['id'], ingredient.id)
-        
+
     def test_update_ingredient(self):
         """Test updating an ingredient."""
         ingredient = Ingredient.objects.create(user=self.user, name='Carrot')
@@ -79,8 +79,8 @@ class PrivateIngredientApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         ingredient.refresh_from_db()
-        self.assertEqual(ingredient.name, payload['name']) 
-    
+        self.assertEqual(ingredient.name, payload['name'])
+
     def test_delete_ingredient(self):
         """Test deleting an ingredient."""
         ingredient = Ingredient.objects.create(user=self.user, name='Tomato')

@@ -3,7 +3,7 @@ Views for the recipe app.
 """
 from drf_spectacular.utils import (
     extend_schema_view,
-    extend_schema, 
+    extend_schema,
     OpenApiParameter,
     OpenApiTypes,)
 from rest_framework import (viewsets, mixins, status)
@@ -11,8 +11,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from recipe.serializers import (RecipeSerializer, 
-                                RecipeDetailSerializer, 
+from recipe.serializers import (RecipeSerializer,
+                                RecipeDetailSerializer,
                                 RecipeImageSerializer,
                                 TagSerializer,
                                 IngredientSerializer)
@@ -62,7 +62,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         # Very important to return queryset not self.queryset
         return queryset.filter(
             user=self.request.user).distinct().order_by('-id')
-    
+
     def get_serializer_class(self):
         """Return appropriate serializer class based on action."""
         if self.action == 'list':
@@ -70,14 +70,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif self.action == 'upload_image':
             return RecipeImageSerializer
         return self.serializer_class
-    
+
     def perform_create(self, serializer):
         """Create a new recipe."""
         serializer.save(user=self.request.user)
     """
     The @action decorator is used to create custom actions in viewsets.
-    By default, it creates a GET endpoint, but you can specify 
-    the method(s) to be used. The detail parameter indicates whether the action 
+    By default, it creates a GET endpoint, but you can specify
+    the method(s) to be used. The detail parameter indicates whether the action
     is for a single object (True) or a list (False).
     The url_path parameter allows you to specify a custom URL for the action.
     The action method should be defined in the viewset class.
@@ -94,8 +94,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 """
-Mixins should be passed before GenericViewSet so that the viewset can be 
-overriden. Mixins are designed to work with GenericViewSet or GenericAPIView, 
+Mixins should be passed before GenericViewSet so that the viewset can be
+overriden. Mixins are designed to work with GenericViewSet or GenericAPIView,
 but they require the base class to provide the necessary functionality.
 """
 
@@ -130,7 +130,7 @@ class BaseRecipeAttrViewSet(mixins.UpdateModelMixin,
         return queryset.filter(
             user=self.request.user
             ).distinct().order_by('-name')
-    
+
 
 class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags in the database."""

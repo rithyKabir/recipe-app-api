@@ -62,7 +62,7 @@ class PrivateRecipeApiTests(TestCase):
             'testpass123'
         )
         self.client.force_authenticate(self.user)
-    
+
     def test_retrieve_recipes(self):
         """Test retrieving a list of recipes."""
         create_recipe(user=self.user)
@@ -176,7 +176,7 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Recipe.objects.count(), 0)
         self.assertEqual(Tag.objects.count(), 0)
-    
+
     def test_create_recipe_without_tags(self):
         """Test creating a recipe without tags."""
         payload = {
@@ -357,7 +357,7 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Recipe.objects.count(), 0)
         self.assertEqual(Ingredient.objects.count(), 0)
-    
+
     def test_create_recipe_without_ingredients(self):
         """Test creating a recipe without ingredients."""
         payload = {
@@ -523,4 +523,3 @@ class imageUploadTests(TestCase):
             url, {'image': 'notanimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-    
