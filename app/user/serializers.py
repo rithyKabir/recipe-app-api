@@ -5,6 +5,7 @@ Serializers for the User API View.
 from django.contrib.auth import (get_user_model, authenticate)
 from rest_framework import serializers
 
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the user object."""
     class Meta:
@@ -45,7 +46,7 @@ class AuthTokenSerializer(serializers.Serializer):
 
         if email and password:
             user = authenticate(request=self.context.get('request'),
-                                 username=email, password=password)
+                                username=email, password=password)
             if not user:
                 msg = 'Unable to authenticate with provided credentials.'
                 raise serializers.ValidationError(msg, code='authorization')

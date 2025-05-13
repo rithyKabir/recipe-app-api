@@ -20,6 +20,7 @@ def create_user(**params):
 
 # Public tests = Unauthenticated requests Example: Creating a user
 
+
 class PublicUserApiTests(TestCase):
     """
     Test the public features of the user API.
@@ -31,9 +32,9 @@ class PublicUserApiTests(TestCase):
     def test_create_user_success(self):
         """Test successfully user creation."""
         payload = {
-            'email' : 'test@example.com',
-            'password' : 'testpass',
-            'name' : 'Test User'
+            'email': 'test@example.com',
+            'password': 'testpass',
+            'name': 'Test User'
         }
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -44,20 +45,20 @@ class PublicUserApiTests(TestCase):
     def test_user_with_email_exists_error(self):
         """Test error returned if user with email exists."""
         payload = {
-            'email' : 'test@example.com',
-            'password' : 'testpass',
-            'name' : 'Test User'
+            'email': 'test@example.com',
+            'password': 'testpass',
+            'name': 'Test User'
         }
         create_user(**payload)
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_password_too_short_error(self):
         """Test an error is occurred if password less than 5 characters."""
         payload = {
-            'email' : 'test@example.com',
-            'password' : 'pw',
-            'name' : 'Test User'
+            'email': 'test@example.com',
+            'password': 'pw',
+            'name': 'Test User'
         }
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -69,15 +70,15 @@ class PublicUserApiTests(TestCase):
     def test_create_token_for_user(self):
         """Test that a token is created for the user."""
         user_details = {
-            'name' : 'Test User',
-            'email' : 'test@example.com',
-            'password' : 'test-pass123',
+            'name': 'Test User',
+            'email': 'test@example.com',
+            'password': 'test-pass123',
         }
         create_user(**user_details)
 
         payload = {
-            'email' : user_details['email'],
-            'password' : user_details['password']
+            'email': user_details['email'],
+            'password': user_details['password']
         }
         res = self.client.post(TOKEN_URL, payload)
         self.assertIn('token', res.data)
@@ -112,6 +113,8 @@ class PublicUserApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 # Private tests = Authenticated requests Example: Retrieving user details
+
+
 class PrivateUserApiTests(TestCase):
     """Test API requests that require authentication."""
     def setUp(self):
@@ -128,8 +131,8 @@ class PrivateUserApiTests(TestCase):
         res = self.client.get(ME_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
-            'name' : self.user.name,
-            'email' : self.user.email
+            'name': self.user.name,
+            'email': self.user.email
         })
 
     def test_post_me_not_allowed(self):
@@ -140,8 +143,8 @@ class PrivateUserApiTests(TestCase):
     def test_update_user_profile(self):
         """Test updating the user profile for authenticated user."""
         payload = {
-            'name' : 'New Name',
-            'password' : 'newpassword'
+            'name': 'New Name',
+            'password': 'newpassword'
         }
         res = self.client.patch(ME_URL, payload)
         self.user.refresh_from_db()

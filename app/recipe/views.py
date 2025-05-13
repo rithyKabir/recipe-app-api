@@ -16,10 +16,11 @@ from recipe.serializers import (RecipeSerializer,
                                 RecipeImageSerializer,
                                 TagSerializer,
                                 IngredientSerializer)
-from core.models import (Recipe, Tag,Ingredient)
+from core.models import (Recipe, Tag, Ingredient)
+
 
 @extend_schema_view(
-    list=extend_schema( #cause we want to extend the schema for list endpoint
+    list=extend_schema(  # Cause we want to extend the schema for list endpoint
         parameters=[
             OpenApiParameter(
                 name='tags',
@@ -49,7 +50,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Return recipes for the authenticated user."""
         tags = self.request.query_params.get('tags')
         ingredients = self.request.query_params.get('ingredients')
-        #adding in a local variable to apply the filters
+        # adding in a local variable to apply the filters
         queryset = self.queryset
         if tags:
             tag_ids = self._params_to_ints(tags)
@@ -58,8 +59,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ingredient_ids = self._params_to_ints(ingredients)
             queryset = queryset.filter(ingredients__id__in=ingredient_ids)
 
-        #Very important to return queryset not self.queryset
-        return queryset.filter(user=self.request.user).distinct().order_by('-id')
+        # Very important to return queryset not self.queryset
+        return queryset.filter(
+            user=self.request.user).distinct().order_by('-id')
     
     def get_serializer_class(self):
         """Return appropriate serializer class based on action."""
@@ -72,12 +74,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Create a new recipe."""
         serializer.save(user=self.request.user)
-
-    #The @action decorator is used to create custom actions in viewsets.
-    # By default, it creates a GET endpoint, but you can specify the method(s) to be used.
-    # The detail parameter indicates whether the action is for a single object (True) or a list (False).
-    # The url_path parameter allows you to specify a custom URL for the action.
-    # The action method should be defined in the viewset class.
+    """
+    The @action decorator is used to create custom actions in viewsets.
+    By default, it creates a GET endpoint, but you can specify 
+    the method(s) to be used. The detail parameter indicates whether the action 
+    is for a single object (True) or a list (False).
+    The url_path parameter allows you to specify a custom URL for the action.
+    The action method should be defined in the viewset class.
+    """
     @action(methods=['POST'], detail=True, url_path='upload-image')
     def upload_image(self, request, pk=None):
         """Upload an image to a recipe."""
@@ -88,8 +92,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#Mixins should be passed before GenericViewSet so that the viewset can be overriden.
-# Mixins are designed to work with GenericViewSet or GenericAPIView, but they require the base class to provide the necessary functionality.
+
+"""
+Mixins should be passed before GenericViewSet so that the viewset can be 
+overriden. Mixins are designed to work with GenericViewSet or GenericAPIView, 
+but they require the base class to provide the necessary functionality.
+"""
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -122,13 +131,14 @@ class BaseRecipeAttrViewSet(mixins.UpdateModelMixin,
             user=self.request.user
             ).distinct().order_by('-name')
     
+
 class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags in the database."""
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
 
+
 class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in the database."""
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    

@@ -15,13 +15,16 @@ from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 RECIPE_URL = reverse('recipe:recipe-list')
 
+
 def detail_url(recipe_id):
     """Create and return a recipe detail URL."""
     return reverse('recipe:recipe-detail', args=[recipe_id])
 
+
 def image_upload_url(recipe_id):
     """Create and return an image upload URL."""
     return reverse('recipe:recipe-upload-image', args=[recipe_id])
+
 
 def create_recipe(user, **params):
     """Create and return a recipe."""
@@ -47,6 +50,7 @@ class PublicRecipeApiTests(TestCase):
         """Test that authentication is required to access the API."""
         res = self.client.get(RECIPE_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateRecipeApiTests(TestCase):
     """Test the private authenticated recipe API."""
@@ -124,7 +128,7 @@ class PrivateRecipeApiTests(TestCase):
         }
         res = self.client.post(RECIPE_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        recipes = Recipe.objects.filter(user = self.user)
+        recipes = Recipe.objects.filter(user=self.user)
         self.assertEqual(recipes.count(), 1)
         recipe = recipes[0]
         self.assertEqual(recipe.tags.count(), 2)
@@ -385,6 +389,7 @@ class PrivateRecipeApiTests(TestCase):
                 user=self.user
             ).exists()
             self.assertTrue(exists)
+
     def test_update_recipe_assigned_to_ingredient(self):
         """Test assigning an existing ingredient when updating a recipe."""
         ingredient1 = Ingredient.objects.create(
@@ -471,7 +476,7 @@ class PrivateRecipeApiTests(TestCase):
 class imageUploadTests(TestCase):
     """Test for the image upload API."""
 
-    #setUp method is used to set up the test environment
+    # setUp method is used to set up the test environment
     # It is called before each test method in the class.
     def setUp(self):
         self.client = APIClient()
@@ -482,7 +487,7 @@ class imageUploadTests(TestCase):
         self.client.force_authenticate(self.user)
         self.recipe = create_recipe(user=self.user)
 
-    #tearDown method is used to clean up after the test
+    # tearDown method is used to clean up after the test
     # It is called after each test method in the class.
     def tearDown(self):
         """Remove the uploaded image after the test."""
@@ -492,7 +497,7 @@ class imageUploadTests(TestCase):
         """Test uploading an image to a recipe."""
         url = image_upload_url(self.recipe.id)
 
-        #This is going to create a temporary file with suffix .jpg
+        # This is going to create a temporary file with suffix .jpg
         # The file is created temporarily and will be deleted automatically
         # outside the with block
         with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
@@ -502,8 +507,9 @@ class imageUploadTests(TestCase):
             img.save(image_file, format='JPEG')
             # Move the file pointer to the beginning of the file
             image_file.seek(0)
-            #format multipart cause it has some texts and some binary data
-            res = self.client.post(url, {'image': image_file}, format='multipart')
+            # format multipart cause it has some texts and some binary data
+            res = self.client.post(
+                url, {'image': image_file}, format='multipart')
 
         self.recipe.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -513,7 +519,8 @@ class imageUploadTests(TestCase):
     def test_upload_image_bad_request(self):
         """Test uploading an invalid image."""
         url = image_upload_url(self.recipe.id)
-        res = self.client.post(url, {'image': 'notanimage'}, format='multipart')
+        res = self.client.post(
+            url, {'image': 'notanimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
     
